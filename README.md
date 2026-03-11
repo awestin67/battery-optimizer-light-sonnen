@@ -17,6 +17,7 @@ Fokus ligger på snabb uppdatering och enkel styrning av driftlägen.
     *   ☀️ **Solproduktion (W)** - Solproduktion just nu.
     *   🏠 **Husförbrukning (W)** - Husets totala förbrukning.
     *   📉 **Virtual Load (W)** - Beräknad nettolast (Konsumtion - Produktion).
+    *   ℹ️ **System Status** - Diagnostik (t.ex. OnGrid, OffGrid).
 *   **Styrning:**
     *   🔘 **Driftläge (Switch)** - Växla mellan `Self Consumption` (Automatiskt läge) och `Manual Mode`.
     *   🛠 **Tjänster** - `force_charge`, `force_discharge`, `hold` och `auto` för avancerad styrning.
@@ -46,7 +47,7 @@ Fokus ligger på snabb uppdatering och enkel styrning av driftlägen.
 
 ## Krav
 *   Sonnen Batteri med **API v2** aktiverat.
-*   **Auth-Token** krävs för att kunna styra batteriet. Logga in på ditt batteri [http://<IP-ADRESS>/dash/login] som user och välj Software integration och därefter slå på JSON API, Read och Write. Kopiera Auth-Token.
+*   **Auth-Token** krävs för att kunna styra batteriet. Logga in på ditt batteri (`http://<IP-ADRESS>/dash/login`) som user och välj **Software integration** och därefter slå på **JSON API**, Read och Write. Kopiera Auth-Token.
 *   Home Assistant 2024.1 eller senare.
 
 ## 🤖 Användning med Battery Optimizer Light
