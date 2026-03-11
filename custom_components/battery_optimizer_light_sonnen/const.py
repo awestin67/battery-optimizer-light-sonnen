@@ -22,7 +22,7 @@ CONF_HOST = "host"
 CONF_PORT = "port"
 CONF_API_TOKEN = "api_token"
 
-DEFAULT_PORT = 8080
+DEFAULT_PORT = 80
 
 # API Endpoints
 API_STATUS = "/api/v2/status"

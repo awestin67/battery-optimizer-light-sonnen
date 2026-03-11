@@ -26,11 +26,11 @@ class SonnenAPI:
     """Klass för att kommunicera med Sonnen API V2."""
 
     def __init__(self, host, port, token, session: aiohttp.ClientSession):
-        self._host = host
+        self._host = host.replace("http://", "").replace("https://", "").rstrip("/")
         self._port = port
         self._token = token
         self._session = session
-        self._base_url = f"http://{host}:{port}"
+        self._base_url = f"http://{self._host}:{port}"
         self._headers = {
             "Auth-Token": self._token,
             "Content-Type": "application/json"

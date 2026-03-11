@@ -1,4 +1,4 @@
-# Battery Optimizer Light - Sonnen
+# Battery Optimizer Light Sonnen
 
 [![HACS](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
 [![Validate and Test](https://github.com/awestin67/battery-optimizer-light-sonnen/actions/workflows/run_tests.yml/badge.svg)](https://github.com/awestin67/battery-optimizer-light-sonnen/actions/workflows/run_tests.yml)
@@ -36,8 +36,8 @@ Fokus ligger på snabb uppdatering och enkel styrning av driftlägen.
 
 1.  Gå till **Inställningar** -> **Enheter & Tjänster**.
 2.  Klicka på **Lägg till integration**.
-3.  Sök efter **Sonnen Batteri**.
-4.  Ange batteriets IP-adress (standardport är `8080`).
+3.  Sök efter **Battery Optimizer Light Sonnen**.
+4.  Ange batteriets IP-adress (standardport är `80`).
 
 ## Krav
 *   Sonnen Batteri med **API v2** aktiverat.

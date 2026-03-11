@@ -27,7 +27,7 @@ async def test_connection_success(hass):
 
     user_input = {
         CONF_HOST: "192.168.1.100",
-        CONF_PORT: 8080,
+        CONF_PORT: 80,
         CONF_API_TOKEN: "test_token"
     }
 
@@ -45,7 +45,7 @@ async def test_connection_success(hass):
         # Verifiera att API anropades med rätt parametrar
         mock_api_cls.assert_called_with(
             host="192.168.1.100",
-            port=8080,
+            port=80,
             token="test_token",
             session=ANY
         )
@@ -54,7 +54,7 @@ async def test_connection_success(hass):
         # Verifiera att entry skapades
         mock_set_unique_id.assert_called_with("192.168.1.100")
         mock_abort.assert_called_once()
-        mock_create_entry.assert_called_with(title="Optimizer Light Sonnen", data=user_input)
+        mock_create_entry.assert_called_with(title="Battery Optimizer Light Sonnen", data=user_input)
 
 @pytest.mark.asyncio
 async def test_connection_failed(hass):
@@ -64,7 +64,7 @@ async def test_connection_failed(hass):
 
     user_input = {
         CONF_HOST: "192.168.1.100",
-        CONF_PORT: 8080,
+        CONF_PORT: 80,
         CONF_API_TOKEN: "bad_token"
     }
 

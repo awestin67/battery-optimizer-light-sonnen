@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Optimizer Light Sonnen",
+        "title": "Battery Optimizer Light Sonnen",
         "description": "Ange anslutningsinformation för ditt Sonnen-batteri.",
         "data": {
           "host": "IP-adress",

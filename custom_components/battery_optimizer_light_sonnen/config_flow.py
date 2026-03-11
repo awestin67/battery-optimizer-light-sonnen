@@ -52,7 +52,7 @@ class SonnenConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 await self.async_set_unique_id(user_input[CONF_HOST])
                 self._abort_if_unique_id_configured()
 
-                return self.async_create_entry(title="Optimizer Light Sonnen", data=user_input)
+                return self.async_create_entry(title="Battery Optimizer Light Sonnen", data=user_input)
 
         data_schema = vol.Schema({
             vol.Required(CONF_HOST): str,

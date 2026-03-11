@@ -73,7 +73,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     # --- Registrera tjänster ---
-    SERVICE_SCHEMA = vol.Schema({vol.Required("power"): cv.non_negative_int})
+    SERVICE_SCHEMA = vol.Schema({vol.Required("power"): cv.natural_int})
 
     async def handle_force_charge(call):
         """Handle the force_charge service call."""
