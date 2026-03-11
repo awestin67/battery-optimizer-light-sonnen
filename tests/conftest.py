@@ -82,6 +82,10 @@ class MockOptionsFlow:
     def async_create_entry(self, *args, **kwargs):
         """Mock method for creating an entry."""
 
+    def add_suggested_values_to_schema(self, schema, suggested_values):
+        """Mock method for adding suggested values."""
+        return schema
+
 mock_hass.OptionsFlow = MockOptionsFlow
 
 class FlowResultType:
