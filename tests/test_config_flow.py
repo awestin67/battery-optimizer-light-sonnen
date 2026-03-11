@@ -95,6 +95,11 @@ async def test_connection_failed(hass):
 async def test_options_flow(hass):
     """Testa options flow."""
     config_entry = MagicMock()
+    config_entry.data = {
+        CONF_HOST: "1.1.1.1",
+        CONF_PORT: 80,
+        CONF_API_TOKEN: "old-token",
+    }
     config_entry.options = {}
 
     flow = SonnenOptionsFlowHandler(config_entry)
@@ -111,17 +116,25 @@ async def test_options_flow(hass):
     assert mock_show_form.call_args[1]["step_id"] == "init"
 
     # Test step_init save data
-    user_input = {CONF_AUTO_CONTROL: True}
+    user_input = {
+        CONF_HOST: "2.2.2.2",
+        CONF_PORT: 8080,
+        CONF_API_TOKEN: "new-token",
+        CONF_AUTO_CONTROL: True,
+    }
     with patch.object(flow, "async_create_entry") as mock_create_entry:
         await flow.async_step_init(user_input=user_input)
 
-        # Verifiera att vi sparade via async_update_entry istället
+        # Verifiera att config data (host, etc) uppdaterades
         hass.config_entries.async_update_entry.assert_called_once()
         call_kwargs = hass.config_entries.async_update_entry.call_args[1]
-        assert call_kwargs["options"][CONF_AUTO_CONTROL] is True
+        assert call_kwargs["data"][CONF_HOST] == "2.2.2.2"
+        assert "options" not in call_kwargs
 
-        # Verifiera att create_entry anropades för att avsluta flödet (med tom data)
-        mock_create_entry.assert_called_with(title="", data={})
+        # Verifiera att options (auto_control) sparades via async_create_entry
+        mock_create_entry.assert_called_with(
+            title="", data={CONF_AUTO_CONTROL: True}
+        )
 
 @pytest.mark.asyncio
 async def test_options_flow_saved_value(hass):

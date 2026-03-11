@@ -107,13 +107,9 @@ class SonnenOptionsFlowHandler(config_entries.OptionsFlow):
             self.hass.config_entries.async_update_entry(
                 self._config_entry,
                 data=config_data,
-                options=options_data # Spara auto_control i options
             )
 
-            # Ladda om integrationen för att de nya inställningarna ska gälla direkt
-            await self.hass.config_entries.async_reload(self._config_entry.entry_id)
-
-            return self.async_create_entry(title="", data={})
+            return self.async_create_entry(title="", data=options_data)
 
         # Hämta nuvarande värden (data + options)
         current_config = {**self._config_entry.data, **self._config_entry.options}
