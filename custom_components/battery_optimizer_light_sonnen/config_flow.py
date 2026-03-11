@@ -117,7 +117,7 @@ class SonnenOptionsFlowHandler(config_entries.OptionsFlow):
             vol.Required(CONF_HOST): TextSelector(),
             vol.Required(CONF_API_TOKEN): TextSelector(),
             vol.Optional(CONF_PORT): int,
-            vol.Optional(CONF_AUTO_CONTROL): BooleanSelector(),
+            vol.Required(CONF_AUTO_CONTROL): BooleanSelector(),
         })
 
         # Fyll i värden med suggested_values (Modern metod som fungerar bättre)
@@ -129,4 +129,10 @@ class SonnenOptionsFlowHandler(config_entries.OptionsFlow):
         }
         schema = self.add_suggested_values_to_schema(schema, suggested_values)
 
-        return self.async_show_form(step_id="init", data_schema=schema)
+        return self.async_show_form(
+            step_id="init",
+            data_schema=schema,
+            description_placeholders={
+                "api_token_url": "https://community.home-assistant.io/t/sonnen-battery-and-home-assistant/16124/165"
+            },
+        )
