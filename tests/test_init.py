@@ -85,7 +85,15 @@ async def test_auto_control_logic(hass):
         await callback(event)
         hass.services.async_call.assert_not_called()
 
-        # --- Testfall: IDLE ---
+        # --- Testfall: IDLE (Manual mode -> Auto) ---
+        hass.services.async_call.reset_mock()
         event.data = {"new_state": MagicMock(state="IDLE")}
+        coordinator.data["OperatingMode"] = "1" # Manuellt läge
         await callback(event)
         hass.services.async_call.assert_called_with(DOMAIN, "auto", {})
+
+        # --- Testfall: IDLE (Redan Auto -> Inget anrop) ---
+        hass.services.async_call.reset_mock()
+        coordinator.data["OperatingMode"] = "2" # Auto läge
+        await callback(event)
+        hass.services.async_call.assert_not_called()
