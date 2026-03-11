@@ -25,17 +25,22 @@ _LOGGER = logging.getLogger(__name__)
 class SonnenAPI:
     """Klass för att kommunicera med Sonnen API V2."""
 
-    def __init__(self, host, port, session: aiohttp.ClientSession):
+    def __init__(self, host, port, token, session: aiohttp.ClientSession):
         self._host = host
         self._port = port
+        self._token = token
         self._session = session
         self._base_url = f"http://{host}:{port}"
+        self._headers = {
+            "Auth-Token": self._token,
+            "Content-Type": "application/json"
+        }
 
     async def async_get_status(self):
         """Hämtar status."""
         url = f"{self._base_url}{API_STATUS}"
         try:
-            async with self._session.get(url) as response:
+            async with self._session.get(url, headers=self._headers) as response:
                 response.raise_for_status()
                 return await response.json()
         except Exception as e:
@@ -48,9 +53,31 @@ class SonnenAPI:
         payload = {"EM_OperatingMode": str(mode)}
 
         try:
-            async with self._session.put(url, json=payload) as response:
+            async with self._session.put(url, json=payload, headers=self._headers) as response:
                 response.raise_for_status()
                 return True
         except Exception as e:
             _LOGGER.error("Fel vid ändring av driftläge: %s", e)
+            return False
+
+    async def async_charge(self, power: int):
+        """Skicka laddningskommando."""
+        url = f"{self._base_url}/api/v2/setpoint/charge/{power}"
+        try:
+            async with self._session.post(url, json={}, headers=self._headers) as response:
+                response.raise_for_status()
+                return True
+        except Exception as e:
+            _LOGGER.error("Fel vid skickande av laddningskommando: %s", e)
+            return False
+
+    async def async_discharge(self, power: int):
+        """Skicka urladdningskommando."""
+        url = f"{self._base_url}/api/v2/setpoint/discharge/{power}"
+        try:
+            async with self._session.post(url, json={}, headers=self._headers) as response:
+                response.raise_for_status()
+                return True
+        except Exception as e:
+            _LOGGER.error("Fel vid skickande av urladdningskommando: %s", e)
             return False

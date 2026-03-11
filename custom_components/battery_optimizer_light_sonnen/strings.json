@@ -1,0 +1,25 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Sonnen Batteri",
+        "description": "Ange anslutningsinformation för ditt Sonnen-batteri.",
+        "data": {
+          "host": "IP-adress",
+          "api_token": "API Token",
+          "port": "Port"
+        },
+        "data_description": {
+          "host": "Lokal IP-adress till ditt Sonnen-batteri. Du hittar den oftast i din router eller via Sonnen-appen.",
+          "api_token": "Krävs för att styra batteriet. Du kan hitta din 'Auth-Token' genom att övervaka nätverkstrafiken från Sonnen-appen. Se [denna guide]({api_token_url}) för mer information."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Anslutningen misslyckades. Kontrollera att IP-adress, port och API-token är korrekta och att batteriet är nåbart på nätverket."
+    },
+    "abort": {
+      "already_configured": "Enheten är redan konfigurerad."
+    }
+  }
+}

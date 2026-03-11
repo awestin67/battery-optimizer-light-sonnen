@@ -25,14 +25,21 @@ async def async_setup_entry(hass, entry, async_add_entities):
     coordinator = data["coordinator"]
     api = data["api"]
 
-    async_add_entities([SonnenManualModeSwitch(coordinator, api)])
+    device_info = {
+        "identifiers": {(DOMAIN, entry.entry_id)},
+        "name": "Sonnen Batteri",
+        "manufacturer": "Sonnen",
+    }
+
+    async_add_entities([SonnenManualModeSwitch(coordinator, api, device_info)])
 
 class SonnenManualModeSwitch(CoordinatorEntity, SwitchEntity):
-    def __init__(self, coordinator, api):
+    def __init__(self, coordinator, api, device_info):
         super().__init__(coordinator)
         self._api = api
         self._attr_name = "Sonnen Manuellt Läge"
         self._attr_unique_id = "sonnen_manual_mode"
+        self._attr_device_info = device_info
 
     @property
     def is_on(self):

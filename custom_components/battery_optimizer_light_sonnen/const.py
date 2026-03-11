@@ -20,6 +20,7 @@
 DOMAIN = "battery_optimizer_light_sonnen"
 CONF_HOST = "host"
 CONF_PORT = "port"
+CONF_API_TOKEN = "api_token"
 
 DEFAULT_PORT = 8080
 

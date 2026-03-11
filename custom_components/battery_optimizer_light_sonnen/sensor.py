@@ -18,29 +18,39 @@
 """Sensor-plattform för Sonnen."""
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.const import EntityCategory
 from .const import DOMAIN
 
 async def async_setup_entry(hass, entry, async_add_entities):
     data = hass.data[DOMAIN][entry.entry_id]
     coordinator = data["coordinator"]
 
+    device_info = {
+        "identifiers": {(DOMAIN, entry.entry_id)},
+        "name": "Sonnen Batteri",
+        "manufacturer": "Sonnen",
+    }
+
     sensors_to_add = [
-        SonnenSensor(coordinator, "USOC", "Batterinivå", "%", "battery"),
-        SonnenSensor(coordinator, "Pac_total_W", "Effekt Totalt", "W", "power"),
-        SonnenSensor(coordinator, "Production_W", "Produktion", "W", "power"),
-        SonnenSensor(coordinator, "Consumption_W", "Förbrukning", "W", "power"),
+        SonnenSensor(coordinator, "USOC", "Batterinivå", "%", "battery", device_info, None),
+        SonnenSensor(coordinator, "Pac_total_W", "Effekt Totalt", "W", "power", device_info, None),
+        SonnenSensor(coordinator, "Production_W", "Produktion", "W", "power", device_info, None),
+        SonnenSensor(coordinator, "Consumption_W", "Förbrukning", "W", "power", device_info, None),
+        SonnenSensor(coordinator, "SystemStatus", "System Status", None, None, device_info, EntityCategory.DIAGNOSTIC),
     ]
 
     async_add_entities(sensors_to_add)
 
 class SonnenSensor(CoordinatorEntity, SensorEntity):
-    def __init__(self, coordinator, json_key, name, unit, device_class=None):
+    def __init__(self, coordinator, json_key, name, unit, device_class, device_info, entity_category):
         super().__init__(coordinator)
         self._json_key = json_key
         self._attr_name = f"Sonnen {name}"
         self._attr_unique_id = f"sonnen_{json_key}"
         self._attr_native_unit_of_measurement = unit
         self._attr_device_class = device_class
+        self._attr_device_info = device_info
+        self._attr_entity_category = entity_category
 
     @property
     def native_value(self):

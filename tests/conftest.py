@@ -35,6 +35,29 @@ mock_hass.config_entries = mock_hass
 mock_hass.data_entry_flow = mock_hass
 mock_hass.SOURCE_USER = "user"
 
+class MockConfigFlow:
+    """Mock för ConfigFlow."""
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__()
+
+    def __init__(self):
+        self.hass = None
+    async def async_step_user(self, user_input=None):
+        pass
+
+    def async_show_form(self, *args, **kwargs):
+        """Mock method for showing a form."""
+
+    def async_create_entry(self, *args, **kwargs):
+        """Mock method for creating an entry."""
+
+    async def async_set_unique_id(self, *args, **kwargs):
+        """Mock method for setting unique ID."""
+
+    def _abort_if_unique_id_configured(self, *args, **kwargs):
+        """Mock method for aborting."""
+mock_hass.ConfigFlow = MockConfigFlow
+
 class FlowResultType:
     FORM = "form"
     CREATE_ENTRY = "create_entry"
@@ -64,6 +87,7 @@ class MockEntity:
     _attr_native_unit_of_measurement = None
     _attr_device_class = None
     _attr_native_value = None
+    _attr_entity_category = None
 
     @property
     def name(self):
@@ -84,6 +108,10 @@ class MockEntity:
     @property
     def native_value(self):
         return self._attr_native_value
+
+    @property
+    def entity_category(self):
+        return self._attr_entity_category
 
 class CoordinatorEntity(MockEntity):
     def __init__(self, coordinator):
