@@ -18,6 +18,7 @@ Fokus ligger på snabb uppdatering och enkel styrning av driftlägen.
     *   🏠 **Förbrukning (W)** - Husets totala förbrukning.
 *   **Styrning:**
     *   🔘 **Driftläge (Switch)** - Växla mellan `Self Consumption` (Automatiskt läge) och `Manual Mode`.
+    *   🛠 **Tjänster** - `force_charge`, `force_discharge`, `hold` och `auto` för avancerad styrning.
 
 ## 📦 Installation
 
@@ -40,9 +41,11 @@ Fokus ligger på snabb uppdatering och enkel styrning av driftlägen.
 2.  Klicka på **Lägg till integration**.
 3.  Sök efter **Battery Optimizer Light Sonnen**.
 4.  Ange batteriets IP-adress (standardport är `80`).
+5.  Ange din **API Token** (Auth-Token). Se denna tråd för tips om hur du hittar den.
 
 ## Krav
 *   Sonnen Batteri med **API v2** aktiverat.
+*   **Auth-Token** krävs för att kunna styra batteriet (läsa data fungerar ofta utan).
 *   Home Assistant 2024.1 eller senare.
 
 ## 🤖 Användning med Battery Optimizer Light
