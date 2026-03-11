@@ -16,6 +16,7 @@ Fokus ligger på snabb uppdatering och enkel styrning av driftlägen.
     *   ⚡ **Effekt (W)** - Nuvarande laddning (negativt) eller urladdning (positivt).
     *   ☀️ **Solproduktion (W)** - Solproduktion just nu.
     *   🏠 **Husförbrukning (W)** - Husets totala förbrukning.
+    *   📉 **Virtual Load (W)** - Beräknad nettolast (Konsumtion - Produktion).
 *   **Styrning:**
     *   🔘 **Driftläge (Switch)** - Växla mellan `Self Consumption` (Automatiskt läge) och `Manual Mode`.
     *   🛠 **Tjänster** - `force_charge`, `force_discharge`, `hold` och `auto` för avancerad styrning.
@@ -91,10 +92,12 @@ action:
           - service: battery_optimizer_light_sonnen.force_discharge
             data:
               power: "{{ target_power }}"
-      - conditions: "{{ current_action == 'HOLD' }}"
+      # HOLD: Skickar bara kommando om batteriet rör sig mer än 100W (Snack-filter)
+      - conditions: "{{ current_action == 'HOLD' and states('sensor.sonnen_effekt_totalt') | float(0) | abs > 100 }}"
         sequence:
           - service: battery_optimizer_light_sonnen.hold
-      - conditions: "{{ current_action == 'IDLE' }}"
+      # IDLE: Växla bara till auto om vi är i manuellt läge (switchen är på)
+      - conditions: "{{ current_action == 'IDLE' and is_state('switch.sonnen_manuellt_lage', 'on') }}"
         sequence:
           - service: battery_optimizer_light_sonnen.auto
 mode: single

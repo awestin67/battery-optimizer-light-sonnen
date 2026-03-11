@@ -18,6 +18,7 @@ import json
 import subprocess
 import sys
 import os
+import shutil
 
 try:
     import requests
@@ -142,6 +143,23 @@ def run_lint():
         print("\n❌ Linting misslyckades! Åtgärda felen innan release.")
         sys.exit(1)
 
+def check_images():
+    """Kollar att bilder finns för HA UI och skapar icon.png om den saknas."""
+    print("\n--- 🖼️  KOLLAR BILDER ---")
+    comp_dir = os.path.join(BASE_DIR, "custom_components", "battery_optimizer_light_sonnen")
+    logo_path = os.path.join(comp_dir, "logo.png")
+    icon_path = os.path.join(comp_dir, "icon.png")
+
+    if os.path.exists(logo_path) and not os.path.exists(icon_path):
+        print("⚠️  icon.png saknas (krävs för integrationslistan).")
+        print("   Kopierar logo.png till icon.png...")
+        shutil.copyfile(logo_path, icon_path)
+        print("✅ icon.png skapad.")
+    elif os.path.exists(icon_path):
+        print("✅ icon.png finns.")
+    else:
+        print("⚠️  Ingen logo.png hittades. Integrationen kommer sakna bilder i HA.")
+
 def create_github_release(version):
     print("\n--- 🚀 SKAPA GITHUB RELEASE ---")
 
@@ -265,6 +283,7 @@ def main():
     check_branch()
     run_tests()
     run_lint()
+    check_images()
     check_for_updates()
 
     # 2. Hämta nuvarande version
