@@ -22,7 +22,6 @@ import async_timeout
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
@@ -73,7 +72,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     # --- Registrera tjänster ---
-    SERVICE_SCHEMA = vol.Schema({vol.Required("power"): cv.natural_int})
+    SERVICE_SCHEMA = vol.Schema({vol.Required("power"): vol.All(vol.Coerce(int), vol.Range(min=0))})
 
     async def handle_force_charge(call):
         """Handle the force_charge service call."""
