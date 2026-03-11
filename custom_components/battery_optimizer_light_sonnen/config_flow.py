@@ -20,7 +20,7 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.helpers.selector import TextSelector, BooleanSelector
+from homeassistant.helpers.selector import TextSelector
 
 from .api import SonnenAPI
 from .const import DOMAIN, CONF_HOST, CONF_PORT, DEFAULT_PORT, CONF_API_TOKEN, CONF_AUTO_CONTROL
@@ -87,6 +87,11 @@ class SonnenOptionsFlowHandler(config_entries.OptionsFlow):
     async def async_step_init(self, user_input=None):
         """Manage the options."""
         if user_input is not None:
+            # Säkerhetsåtgärd: Rensa mellanslag från strängar
+            for key, value in user_input.items():
+                if isinstance(value, str):
+                    user_input[key] = value.strip()
+
             # Separera options (auto_control) från data (host, token, port)
             options_data = {
                 CONF_AUTO_CONTROL: user_input.get(CONF_AUTO_CONTROL, False)
@@ -117,7 +122,7 @@ class SonnenOptionsFlowHandler(config_entries.OptionsFlow):
             vol.Required(CONF_HOST): TextSelector(),
             vol.Required(CONF_API_TOKEN): TextSelector(),
             vol.Optional(CONF_PORT): int,
-            vol.Required(CONF_AUTO_CONTROL): BooleanSelector(),
+            vol.Optional(CONF_AUTO_CONTROL): bool,
         })
 
         # Fyll i värden med suggested_values (Modern metod som fungerar bättre)
