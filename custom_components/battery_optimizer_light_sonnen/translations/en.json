@@ -31,12 +31,12 @@
     "options": {
       "step": {
         "init": {
-          "title": "Inställningar för Optimizer Light Sonnen",
+          "title": "Inställningar",
           "data": {
             "auto_control": "Aktivera automatisk styrning"
           },
           "data_description": {
-            "auto_control": "Om aktiverad kommer denna integration automatiskt att lyssna på 'sensor.optimizer_light_action' och styra batteriet. Detta ersätter behovet av en separat automation."
+            "auto_control": "Om aktiverad lyssnar integrationen automatiskt på 'sensor.optimizer_light_action' från Battery Optimizer Light och styr batteriet därefter (Ladda, Ladda ur, Pausa, Auto). Detta eliminerar behovet av en separat automation."
           }
         }
       }

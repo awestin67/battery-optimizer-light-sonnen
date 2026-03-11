@@ -1,0 +1,51 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Battery Optimizer Light Sonnen",
+        "description": "Ange anslutningsinformation för ditt Sonnen-batteri.",
+        "data": {
+          "host": "IP-adress",
+          "api_token": "API Token",
+          "port": "Port"
+        },
+        "data_description": {
+          "host": "Lokal IP-adress till ditt Sonnen-batteri. Du hittar den oftast i din router eller via Sonnen-appen.",
+          "api_token": "Krävs för att styra batteriet. Logga in på ditt batteri (http://<IP-ADRESS>/dash/login) som 'user', välj 'Software integration' och slå på 'JSON API' (både Read och Write). Kopiera sedan din Auth-Token därifrån. Se även [denna guide]({api_token_url})."
+        }
+      },
+      "reconfigure": {
+        "title": "Konfigurera om Sonnen",
+        "description": "Uppdatera anslutningsuppgifter för ditt Sonnen-batteri.",
+        "data": {
+          "host": "IP-adress",
+          "api_token": "API Token",
+          "port": "Port"
+        },
+        "data_description": {
+          "host": "Lokal IP-adress till ditt Sonnen-batteri.",
+          "api_token": "Krävs för att styra batteriet. Logga in på ditt batteri och hämta Auth-Token under 'Software integration'."
+        }
+      }
+    },
+    "options": {
+      "step": {
+        "init": {
+          "title": "Inställningar",
+          "data": {
+            "auto_control": "Aktivera automatisk styrning"
+          },
+          "data_description": {
+            "auto_control": "Om aktiverad lyssnar integrationen automatiskt på 'sensor.optimizer_light_action' från Battery Optimizer Light och styr batteriet därefter (Ladda, Ladda ur, Pausa, Auto). Detta eliminerar behovet av en separat automation."
+          }
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Anslutningen misslyckades. Kontrollera att IP-adress, port och API-token är korrekta och att batteriet är nåbart på nätverket."
+    },
+    "abort": {
+      "already_configured": "Enheten är redan konfigurerad."
+    }
+  }
+}
