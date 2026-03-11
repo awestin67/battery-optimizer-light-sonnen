@@ -1,7 +1,8 @@
 # Battery Optimizer Light - Sonnen
 
-[![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
+[![HACS](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
 [![Validate and Test](https://github.com/awestin67/battery-optimizer-light-sonnen/actions/workflows/run_tests.yml/badge.svg)](https://github.com/awestin67/battery-optimizer-light-sonnen/actions/workflows/run_tests.yml)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 En lättviktig Home Assistant-integration för att övervaka och styra **Sonnen Batterier** via API v2.
 Fokus ligger på snabb uppdatering och enkel styrning av driftlägen.
