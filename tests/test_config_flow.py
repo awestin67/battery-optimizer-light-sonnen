@@ -89,46 +89,6 @@ async def test_connection_failed(hass):
         assert mock_show_form.call_args[1]["step_id"] == "user"
         assert mock_show_form.call_args[1]["errors"] == {"base": "cannot_connect"}
 
-@pytest.mark.asyncio
-async def test_reconfigure_flow(hass):
-    """Testa reconfigure flow med saknad API token."""
-    flow = SonnenConfigFlow()
-    flow.hass = hass
-    flow.context = {"entry_id": "test_entry"}
-
-    # Mocka existerande entry utan token
-    mock_entry = MagicMock()
-    mock_entry.data = {
-        CONF_HOST: "1.2.3.4",
-        CONF_PORT: 80
-        # CONF_API_TOKEN saknas
-    }
-
-    with patch.object(hass.config_entries, "async_get_entry", return_value=mock_entry):
-        # Steg 1: Visa formulär
-        with patch.object(flow, "async_show_form") as mock_show_form:
-            await flow.async_step_reconfigure(user_input=None)
-
-        mock_show_form.assert_called_once()
-        assert mock_show_form.call_args[1]["step_id"] == "reconfigure"
-
-        # Steg 2: Spara ny data
-        user_input = {
-            CONF_HOST: "1.2.3.4",
-            CONF_PORT: 80,
-            CONF_API_TOKEN: "new_token"
-        }
-
-        with patch("custom_components.battery_optimizer_light_sonnen.config_flow.SonnenAPI") as mock_api_cls, \
-             patch.object(flow, "async_update_reload_and_abort") as mock_update:
-
-            mock_api_cls.return_value.async_get_status = AsyncMock(return_value={})
-
-            await flow.async_step_reconfigure(user_input=user_input)
-
-            mock_update.assert_called_once()
-            assert mock_update.call_args[1]["data"][CONF_API_TOKEN] == "new_token"
-
 # --- TESTER FÖR OPTIONS FLOW ---
 
 @pytest.mark.asyncio
@@ -139,6 +99,9 @@ async def test_options_flow(hass):
 
     flow = SonnenOptionsFlowHandler(config_entry)
     flow.hass = hass
+
+    # Konfigurera mock för async_reload så den går att awaita
+    hass.config_entries.async_reload = AsyncMock()
 
     # Test step_init show form
     with patch.object(flow, "async_show_form") as mock_show_form:
@@ -152,4 +115,10 @@ async def test_options_flow(hass):
     with patch.object(flow, "async_create_entry") as mock_create_entry:
         await flow.async_step_init(user_input=user_input)
 
-    mock_create_entry.assert_called_with(title="", data=user_input)
+        # Verifiera att vi sparade via async_update_entry istället
+        hass.config_entries.async_update_entry.assert_called_once()
+        call_kwargs = hass.config_entries.async_update_entry.call_args[1]
+        assert call_kwargs["options"][CONF_AUTO_CONTROL] is True
+
+        # Verifiera att create_entry anropades för att avsluta flödet (med tom data)
+        mock_create_entry.assert_called_with(title="", data={})

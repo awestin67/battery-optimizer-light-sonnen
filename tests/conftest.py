@@ -28,6 +28,7 @@ sys.modules["homeassistant.helpers.entity"] = mock_hass
 sys.modules["homeassistant.helpers.update_coordinator"] = mock_hass
 sys.modules["homeassistant.helpers.aiohttp_client"] = mock_hass
 sys.modules["homeassistant.helpers.event"] = mock_hass
+sys.modules["homeassistant.helpers.selector"] = mock_hass
 sys.modules["homeassistant.components"] = mock_hass
 sys.modules["homeassistant.components.sensor"] = mock_hass
 sys.modules["homeassistant.components.switch"] = mock_hass
@@ -80,6 +81,10 @@ class MockOptionsFlow:
 
     def async_create_entry(self, *args, **kwargs):
         """Mock method for creating an entry."""
+
+    def add_suggested_values_to_schema(self, schema, suggested_values):
+        """Mock method for adding suggested values."""
+        return schema
 
 mock_hass.OptionsFlow = MockOptionsFlow
 

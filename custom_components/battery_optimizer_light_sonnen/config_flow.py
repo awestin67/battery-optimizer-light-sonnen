@@ -20,6 +20,7 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.selector import TextSelector, BooleanSelector
 
 from .api import SonnenAPI
 from .const import DOMAIN, CONF_HOST, CONF_PORT, DEFAULT_PORT, CONF_API_TOKEN, CONF_AUTO_CONTROL
@@ -76,49 +77,6 @@ class SonnenConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             },
         )
 
-    async def async_step_reconfigure(self, user_input=None):
-        """Hantera omkonfigurering."""
-        errors = {}
-        entry = self.hass.config_entries.async_get_entry(self.context["entry_id"])
-
-        if user_input is not None:
-            session = async_get_clientsession(self.hass)
-            api = SonnenAPI(
-                host=user_input[CONF_HOST],
-                port=user_input[CONF_PORT],
-                token=user_input[CONF_API_TOKEN],
-                session=session,
-            )
-
-            try:
-                await api.async_get_status()
-            except Exception:
-                _LOGGER.warning("Kunde inte ansluta till Sonnen-batteriet vid %s", user_input[CONF_HOST])
-                errors["base"] = "cannot_connect"
-            else:
-                # Skapa en ny data-struktur som rensar bort gamla/okända nycklar
-                new_data = {
-                    CONF_HOST: user_input[CONF_HOST],
-                    CONF_PORT: user_input[CONF_PORT],
-                    CONF_API_TOKEN: user_input[CONF_API_TOKEN],
-                }
-                return self.async_update_reload_and_abort(entry, data=new_data)
-
-        data_schema = vol.Schema({
-            vol.Required(CONF_HOST, default=entry.data.get(CONF_HOST)): str,
-            vol.Required(CONF_API_TOKEN, default=entry.data.get(CONF_API_TOKEN)): str,
-            vol.Optional(CONF_PORT, default=entry.data.get(CONF_PORT, DEFAULT_PORT)): int,
-        })
-
-        return self.async_show_form(
-            step_id="reconfigure",
-            data_schema=data_schema,
-            errors=errors,
-            description_placeholders={
-                "api_token_url": "https://community.home-assistant.io/t/sonnen-battery-and-home-assistant/16124/165"
-            },
-        )
-
 class SonnenOptionsFlowHandler(config_entries.OptionsFlow):
     """Handle an options flow for Sonnen."""
 
@@ -129,16 +87,40 @@ class SonnenOptionsFlowHandler(config_entries.OptionsFlow):
     async def async_step_init(self, user_input=None):
         """Manage the options."""
         if user_input is not None:
-            return self.async_create_entry(title="", data=user_input)
+            # Separera options (auto_control) från data (host, token, port)
+            options_data = {
+                CONF_AUTO_CONTROL: user_input.get(CONF_AUTO_CONTROL, False)
+            }
 
-        return self.async_show_form(
-            step_id="init",
-            data_schema=vol.Schema(
-                {
-                    vol.Optional(
-                        CONF_AUTO_CONTROL,
-                        default=self._config_entry.options.get(CONF_AUTO_CONTROL, False),
-                    ): bool,
-                }
-            ),
-        )
+            config_data = {
+                CONF_HOST: user_input.get(CONF_HOST),
+                CONF_PORT: user_input.get(CONF_PORT),
+                CONF_API_TOKEN: user_input.get(CONF_API_TOKEN),
+            }
+
+            # Uppdatera huvudkonfigurationen
+            self.hass.config_entries.async_update_entry(
+                self._config_entry,
+                data=config_data,
+                options=options_data # Spara auto_control i options
+            )
+
+            # Ladda om integrationen för att de nya inställningarna ska gälla direkt
+            await self.hass.config_entries.async_reload(self._config_entry.entry_id)
+
+            return self.async_create_entry(title="", data={})
+
+        # Hämta nuvarande värden (data + options)
+        current_config = {**self._config_entry.data, **self._config_entry.options}
+
+        schema = vol.Schema({
+            vol.Required(CONF_HOST): TextSelector(),
+            vol.Required(CONF_API_TOKEN): TextSelector(),
+            vol.Optional(CONF_PORT, default=DEFAULT_PORT): int,
+            vol.Optional(CONF_AUTO_CONTROL): BooleanSelector(),
+        })
+
+        # Fyll i värden med suggested_values
+        schema = self.add_suggested_values_to_schema(schema, current_config)
+
+        return self.async_show_form(step_id="init", data_schema=schema)
