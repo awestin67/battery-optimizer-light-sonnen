@@ -1,11 +1,11 @@
 {
   "domain": "battery_optimizer_light_sonnen",
-  "name": "Sonnen Batteri",
+  "name": "Sonnen Optimizer Light",
   "codeowners": [],
   "dependencies": [],
   "documentation": "https://github.com/awestin67/battery-optimizer-light-sonnen",
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/awestin67/battery-optimizer-light-sonnen/issues",
   "requirements": [],
-  "version": "0.0.6"
+  "version": "0.0.4"
 }

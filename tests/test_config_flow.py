@@ -54,7 +54,7 @@ async def test_connection_success(hass):
         # Verifiera att entry skapades
         mock_set_unique_id.assert_called_with("192.168.1.100")
         mock_abort.assert_called_once()
-        mock_create_entry.assert_called_with(title="Sonnen Batteri", data=user_input)
+        mock_create_entry.assert_called_with(title="Sonnen Optimizer Light", data=user_input)
 
 @pytest.mark.asyncio
 async def test_connection_failed(hass):

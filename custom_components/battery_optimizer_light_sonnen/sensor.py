@@ -27,7 +27,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
     device_info = {
         "identifiers": {(DOMAIN, entry.entry_id)},
-        "name": "Sonnen Batteri",
+        "name": "Sonnen Optimizer Light",
         "manufacturer": "Sonnen",
     }
 
