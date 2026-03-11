@@ -14,8 +14,8 @@ Fokus ligger på snabb uppdatering och enkel styrning av driftlägen.
 *   **Sensorer:**
     *   🔋 **Batterinivå (USOC)** - Visar aktuell laddningsnivå i %.
     *   ⚡ **Effekt (W)** - Nuvarande laddning (negativt) eller urladdning (positivt).
-    *   ☀️ **Produktion (W)** - Solproduktion just nu.
-    *   🏠 **Förbrukning (W)** - Husets totala förbrukning.
+    *   ☀️ **Solproduktion (W)** - Solproduktion just nu.
+    *   🏠 **Husförbrukning (W)** - Husets totala förbrukning.
 *   **Styrning:**
     *   🔘 **Driftläge (Switch)** - Växla mellan `Self Consumption` (Automatiskt läge) och `Manual Mode`.
     *   🛠 **Tjänster** - `force_charge`, `force_discharge`, `hold` och `auto` för avancerad styrning.
@@ -45,7 +45,7 @@ Fokus ligger på snabb uppdatering och enkel styrning av driftlägen.
 
 ## Krav
 *   Sonnen Batteri med **API v2** aktiverat.
-*   **Auth-Token** krävs för att kunna styra batteriet (läsa data fungerar ofta utan).
+*   **Auth-Token** krävs för att kunna styra batteriet. Logga in på ditt batteri [http://<IP-ADRESS>/dash/login] som user och välj Software integration och därefter slå på JSON API, Read och Write. Kopiera Auth-Token.
 *   Home Assistant 2024.1 eller senare.
 
 ## 🤖 Användning med Battery Optimizer Light

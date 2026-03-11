@@ -3,7 +3,7 @@
 
 """Tester för sensorer."""
 from unittest.mock import MagicMock
-from custom_components.battery_optimizer_light_sonnen.sensor import SonnenSensor
+from custom_components.battery_optimizer_light_sonnen.sensor import SonnenSensor, SonnenVirtualLoadSensor
 from homeassistant.const import EntityCategory
 
 def test_sonnen_sensor_values():
@@ -51,3 +51,16 @@ def test_diagnostic_sensor():
 
     assert sensor.entity_category == EntityCategory.DIAGNOSTIC
     assert sensor.native_value == "OnGrid"
+
+def test_virtual_load_sensor():
+    """Testa att virtuell last beräknas korrekt (Konsumtion - Produktion)."""
+    coordinator = MagicMock()
+    coordinator.data = {
+        "Consumption_W": 3000,
+        "Production_W": 1000
+    }
+
+    sensor = SonnenVirtualLoadSensor(coordinator, {})
+
+    # Förväntat värde: 3000 - 1000 = 2000
+    assert sensor.native_value == 2000

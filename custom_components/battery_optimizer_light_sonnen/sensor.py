@@ -34,8 +34,9 @@ async def async_setup_entry(hass, entry, async_add_entities):
     sensors_to_add = [
         SonnenSensor(coordinator, "USOC", "Batterinivå", "%", "battery", device_info, None),
         SonnenSensor(coordinator, "Pac_total_W", "Effekt Totalt", "W", "power", device_info, None),
-        SonnenSensor(coordinator, "Production_W", "Produktion", "W", "power", device_info, None),
-        SonnenSensor(coordinator, "Consumption_W", "Förbrukning", "W", "power", device_info, None),
+        SonnenSensor(coordinator, "Production_W", "Solproduktion", "W", "power", device_info, None),
+        SonnenSensor(coordinator, "Consumption_W", "Husförbrukning", "W", "power", device_info, None),
+        SonnenVirtualLoadSensor(coordinator, device_info),
         SonnenSensor(coordinator, "SystemStatus", "System Status", None, None, device_info, EntityCategory.DIAGNOSTIC),
     ]
 
@@ -55,3 +56,19 @@ class SonnenSensor(CoordinatorEntity, SensorEntity):
     @property
     def native_value(self):
         return self.coordinator.data.get(self._json_key)
+
+class SonnenVirtualLoadSensor(CoordinatorEntity, SensorEntity):
+    """Sensor som beräknar virtuell last (Konsumtion - Produktion)."""
+    def __init__(self, coordinator, device_info):
+        super().__init__(coordinator)
+        self._attr_name = "Sonnen Virtual Load"
+        self._attr_unique_id = "sonnen_virtual_load"
+        self._attr_native_unit_of_measurement = "W"
+        self._attr_device_class = "power"
+        self._attr_device_info = device_info
+
+    @property
+    def native_value(self):
+        consumption = self.coordinator.data.get("Consumption_W", 0)
+        production = self.coordinator.data.get("Production_W", 0)
+        return consumption - production
