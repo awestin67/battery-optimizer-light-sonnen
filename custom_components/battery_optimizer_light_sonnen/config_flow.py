@@ -68,3 +68,40 @@ class SonnenConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 "api_token_url": "https://community.home-assistant.io/t/sonnen-battery-and-home-assistant/16124/165"
             },
         )
+
+    async def async_step_reconfigure(self, user_input=None):
+        """Hantera omkonfigurering."""
+        errors = {}
+        entry = self.hass.config_entries.async_get_entry(self.context["entry_id"])
+
+        if user_input is not None:
+            session = async_get_clientsession(self.hass)
+            api = SonnenAPI(
+                host=user_input[CONF_HOST],
+                port=user_input[CONF_PORT],
+                token=user_input[CONF_API_TOKEN],
+                session=session,
+            )
+
+            try:
+                await api.async_get_status()
+            except Exception:
+                _LOGGER.warning("Kunde inte ansluta till Sonnen-batteriet vid %s", user_input[CONF_HOST])
+                errors["base"] = "cannot_connect"
+            else:
+                return self.async_update_reload_and_abort(entry, data=user_input)
+
+        data_schema = vol.Schema({
+            vol.Required(CONF_HOST, default=entry.data[CONF_HOST]): str,
+            vol.Required(CONF_API_TOKEN, default=entry.data[CONF_API_TOKEN]): str,
+            vol.Optional(CONF_PORT, default=entry.data.get(CONF_PORT, DEFAULT_PORT)): int,
+        })
+
+        return self.async_show_form(
+            step_id="reconfigure",
+            data_schema=data_schema,
+            errors=errors,
+            description_placeholders={
+                "api_token_url": "https://community.home-assistant.io/t/sonnen-battery-and-home-assistant/16124/165"
+            },
+        )

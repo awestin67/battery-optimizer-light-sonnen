@@ -150,7 +150,7 @@ def check_images():
     logo_path = os.path.join(comp_dir, "logo.png")
     icon_path = os.path.join(comp_dir, "icon.png")
 
-    if os.path.exists(logo_path) and not os.path.exists(icon_path):
+    if os.path.exists(logo_path) and (not os.path.exists(icon_path) or os.path.getsize(icon_path) == 0):
         print("⚠️  icon.png saknas (krävs för integrationslistan).")
         print("   Kopierar logo.png till icon.png...")
         shutil.copyfile(logo_path, icon_path)

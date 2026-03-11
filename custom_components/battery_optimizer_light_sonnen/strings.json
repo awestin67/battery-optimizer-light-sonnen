@@ -13,6 +13,19 @@
           "host": "Lokal IP-adress till ditt Sonnen-batteri. Du hittar den oftast i din router eller via Sonnen-appen.",
           "api_token": "Krävs för att styra batteriet. Du kan hitta din 'Auth-Token' genom att övervaka nätverkstrafiken från Sonnen-appen. Se [denna guide]({api_token_url}) för mer information."
         }
+      },
+      "reconfigure": {
+        "title": "Konfigurera om Sonnen",
+        "description": "Uppdatera anslutningsuppgifter för ditt Sonnen-batteri.",
+        "data": {
+          "host": "IP-adress",
+          "api_token": "API Token",
+          "port": "Port"
+        },
+        "data_description": {
+          "host": "Lokal IP-adress till ditt Sonnen-batteri.",
+          "api_token": "Krävs för att styra batteriet."
+        }
       }
     },
     "error": {
