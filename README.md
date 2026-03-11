@@ -55,16 +55,17 @@ Denna integration är designad för att fungera direkt med [Battery Optimizer Li
 
 ### Automatisk Styrning
 
-Denna integration kan automatiskt lyssna på beslut från `Battery Optimizer Light` och styra ditt batteri, vilket eliminerar behovet av en separat automation.
+Denna integration lyssnar **automatiskt** på beslut från `Battery Optimizer Light` och styr ditt batteri, vilket eliminerar behovet av en separat automation. Detta är standardbeteendet.
 
+Om du vill stänga av detta och använda egna automationer:
 1.  Gå till **Inställningar** -> **Enheter & Tjänster** och klicka på **Konfigurera** för `Battery Optimizer Light Sonnen`.
-2.  Kryssa i rutan **Aktivera automatisk styrning**.
+2.  Avmarkera rutan **Enable automatic control**.
 
-Integrationen kommer nu att lyssna på `sensor.optimizer_light_action` och agera därefter. Om du föredrar att använda egna automationer kan du lämna rutan urkryssad och använda de inbyggda tjänsterna (`force_charge`, `hold`, etc.) manuellt.
+Om automatisk styrning är avstängd kan du använda de inbyggda tjänsterna (`force_charge`, `hold`, etc.) i dina egna automationer.
 
 ### Manuell Automation (Valfritt)
 
-Om du **inte** aktiverar automatisk styrning, kan du använda denna automation för att koppla ihop Optimizer Light med Sonnen-integrationen:
+Om du har stängt av automatisk styrning kan du använda denna automation för att koppla ihop Optimizer Light med Sonnen-integrationen:
 
 ```yaml
 alias: 🔋 Battery Optimizer Light - Utför Beslut (Sonnen Integration)

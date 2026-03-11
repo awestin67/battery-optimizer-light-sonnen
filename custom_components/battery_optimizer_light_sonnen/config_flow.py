@@ -125,7 +125,7 @@ class SonnenOptionsFlowHandler(config_entries.OptionsFlow):
             CONF_HOST: current_config.get(CONF_HOST),
             CONF_API_TOKEN: current_config.get(CONF_API_TOKEN),
             CONF_PORT: current_config.get(CONF_PORT, DEFAULT_PORT),
-            CONF_AUTO_CONTROL: current_config.get(CONF_AUTO_CONTROL, False),
+            CONF_AUTO_CONTROL: current_config.get(CONF_AUTO_CONTROL, True),
         }
         schema = self.add_suggested_values_to_schema(schema, suggested_values)
 

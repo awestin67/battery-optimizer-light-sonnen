@@ -133,7 +133,7 @@ async def async_setup_auto_control(hass: HomeAssistant, entry: ConfigEntry):
         domain_data["auto_control_listener"] = None
 
     # If auto control is enabled, set up a new listener
-    if entry.options.get(CONF_AUTO_CONTROL, False):
+    if entry.options.get(CONF_AUTO_CONTROL, True):
         _LOGGER.info("Automatic control from sensor.optimizer_light_action is enabled.")
 
         async def handle_optimizer_action_change(event: Event):
