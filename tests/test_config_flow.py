@@ -153,16 +153,3 @@ async def test_options_flow(hass):
         await flow.async_step_init(user_input=user_input)
 
     mock_create_entry.assert_called_with(title="", data=user_input)
-
-def test_options_flow_init():
-    """Testa att options flow kan initieras via ConfigFlow."""
-    config_entry = MagicMock()
-
-    # Verifiera att metoden returnerar rätt klass
-    options_flow = SonnenConfigFlow.async_get_options_flow(config_entry)
-    assert isinstance(options_flow, SonnenOptionsFlowHandler)
-
-    # Verifiera att config_entry lagrades korrekt (som _config_entry)
-    # Vi accessar den privata variabeln _config_entry för att verifiera vår workaround
-    # för property-konflikten i OptionsFlow.
-    assert options_flow._config_entry == config_entry

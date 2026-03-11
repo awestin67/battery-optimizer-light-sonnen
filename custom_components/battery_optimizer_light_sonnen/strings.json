@@ -11,7 +11,7 @@
         },
         "data_description": {
           "host": "Lokal IP-adress till ditt Sonnen-batteri. Du hittar den oftast i din router eller via Sonnen-appen.",
-          "api_token": "Krävs för att styra batteriet. Du kan hitta din 'Auth-Token' genom att övervaka nätverkstrafiken från Sonnen-appen. Se [denna guide]({api_token_url}) för mer information."
+          "api_token": "Krävs för att styra batteriet. Logga in på ditt batteri (http://<IP-ADRESS>/dash/login) som 'user', välj 'Software integration' och slå på 'JSON API' (både Read och Write). Kopiera sedan din Auth-Token därifrån. Se även [denna guide]({api_token_url})."
         }
       },
       "reconfigure": {
@@ -24,7 +24,7 @@
         },
         "data_description": {
           "host": "Lokal IP-adress till ditt Sonnen-batteri.",
-          "api_token": "Krävs för att styra batteriet."
+          "api_token": "Krävs för att styra batteriet. Logga in på ditt batteri och hämta Auth-Token under 'Software integration'."
         }
       }
     },
