@@ -3,9 +3,16 @@
 
 """Testar config flow."""
 import pytest
-from unittest.mock import patch, AsyncMock, ANY
-from custom_components.battery_optimizer_light_sonnen.config_flow import SonnenConfigFlow
-from custom_components.battery_optimizer_light_sonnen.const import CONF_HOST, CONF_PORT, CONF_API_TOKEN
+from unittest.mock import patch, AsyncMock, ANY, MagicMock
+from custom_components.battery_optimizer_light_sonnen.config_flow import SonnenConfigFlow, SonnenOptionsFlowHandler
+from custom_components.battery_optimizer_light_sonnen.const import (
+    CONF_HOST,
+    CONF_PORT,
+    CONF_API_TOKEN,
+    CONF_AUTO_CONTROL,
+)
+
+# --- TESTER FÖR CONFIG FLOW ---
 
 @pytest.mark.asyncio
 async def test_show_form(hass):
@@ -81,3 +88,28 @@ async def test_connection_failed(hass):
         mock_show_form.assert_called_once()
         assert mock_show_form.call_args[1]["step_id"] == "user"
         assert mock_show_form.call_args[1]["errors"] == {"base": "cannot_connect"}
+
+# --- TESTER FÖR OPTIONS FLOW ---
+
+@pytest.mark.asyncio
+async def test_options_flow(hass):
+    """Testa options flow."""
+    config_entry = MagicMock()
+    config_entry.options = {}
+
+    flow = SonnenOptionsFlowHandler(config_entry)
+    flow.hass = hass
+
+    # Test step_init show form
+    with patch.object(flow, "async_show_form") as mock_show_form:
+        await flow.async_step_init(user_input=None)
+
+    mock_show_form.assert_called_once()
+    assert mock_show_form.call_args[1]["step_id"] == "init"
+
+    # Test step_init save data
+    user_input = {CONF_AUTO_CONTROL: True}
+    with patch.object(flow, "async_create_entry") as mock_create_entry:
+        await flow.async_step_init(user_input=user_input)
+
+    mock_create_entry.assert_called_with(title="", data=user_input)

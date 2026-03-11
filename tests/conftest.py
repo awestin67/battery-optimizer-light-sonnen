@@ -23,6 +23,7 @@ sys.modules["homeassistant.helpers"] = mock_hass
 sys.modules["homeassistant.helpers.entity"] = mock_hass
 sys.modules["homeassistant.helpers.update_coordinator"] = mock_hass
 sys.modules["homeassistant.helpers.aiohttp_client"] = mock_hass
+sys.modules["homeassistant.helpers.event"] = mock_hass
 sys.modules["homeassistant.components"] = mock_hass
 sys.modules["homeassistant.components.sensor"] = mock_hass
 sys.modules["homeassistant.components.switch"] = mock_hass
@@ -57,6 +58,23 @@ class MockConfigFlow:
     def _abort_if_unique_id_configured(self, *args, **kwargs):
         """Mock method for aborting."""
 mock_hass.ConfigFlow = MockConfigFlow
+
+class MockOptionsFlow:
+    """Mock för OptionsFlow."""
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__()
+    def __init__(self):
+        self.hass = None
+    async def async_step_init(self, user_input=None):
+        pass
+
+    def async_show_form(self, *args, **kwargs):
+        """Mock method for showing a form."""
+
+    def async_create_entry(self, *args, **kwargs):
+        """Mock method for creating an entry."""
+
+mock_hass.OptionsFlow = MockOptionsFlow
 
 class FlowResultType:
     FORM = "form"

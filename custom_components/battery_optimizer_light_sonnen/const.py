@@ -21,6 +21,7 @@ DOMAIN = "battery_optimizer_light_sonnen"
 CONF_HOST = "host"
 CONF_PORT = "port"
 CONF_API_TOKEN = "api_token"
+CONF_AUTO_CONTROL = "auto_control"
 
 DEFAULT_PORT = 80
 

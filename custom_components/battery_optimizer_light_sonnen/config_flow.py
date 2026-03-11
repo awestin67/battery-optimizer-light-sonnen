@@ -18,10 +18,11 @@
 import logging
 import voluptuous as vol
 from homeassistant import config_entries
+from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import SonnenAPI
-from .const import DOMAIN, CONF_HOST, CONF_PORT, DEFAULT_PORT, CONF_API_TOKEN
+from .const import DOMAIN, CONF_HOST, CONF_PORT, DEFAULT_PORT, CONF_API_TOKEN, CONF_AUTO_CONTROL
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -29,6 +30,12 @@ class SonnenConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Hantera konfigurationsflödet."""
 
     VERSION = 1
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry):
+        """Get the options flow for this handler."""
+        return SonnenOptionsFlowHandler(config_entry)
 
     async def async_step_user(self, user_input=None):
         """Hantera ett flödessteg initierat av användaren."""
@@ -67,6 +74,30 @@ class SonnenConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             description_placeholders={
                 "api_token_url": "https://community.home-assistant.io/t/sonnen-battery-and-home-assistant/16124/165"
             },
+        )
+
+class SonnenOptionsFlowHandler(config_entries.OptionsFlow):
+    """Handle an options flow for Sonnen."""
+
+    def __init__(self, config_entry: config_entries.ConfigEntry):
+        """Initialize options flow."""
+        self.config_entry = config_entry
+
+    async def async_step_init(self, user_input=None):
+        """Manage the options."""
+        if user_input is not None:
+            return self.async_create_entry(title="", data=user_input)
+
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema(
+                {
+                    vol.Optional(
+                        CONF_AUTO_CONTROL,
+                        default=self.config_entry.options.get(CONF_AUTO_CONTROL, False),
+                    ): bool,
+                }
+            ),
         )
 
     async def async_step_reconfigure(self, user_input=None):

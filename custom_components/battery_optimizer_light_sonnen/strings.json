@@ -28,6 +28,19 @@
         }
       }
     },
+    "options": {
+      "step": {
+        "init": {
+          "title": "Inställningar för Optimizer Light Sonnen",
+          "data": {
+            "auto_control": "Aktivera automatisk styrning"
+          },
+          "data_description": {
+            "auto_control": "Om aktiverad kommer denna integration automatiskt att lyssna på 'sensor.optimizer_light_action' och styra batteriet. Detta ersätter behovet av en separat automation."
+          }
+        }
+      }
+    },
     "error": {
       "cannot_connect": "Anslutningen misslyckades. Kontrollera att IP-adress, port och API-token är korrekta och att batteriet är nåbart på nätverket."
     },

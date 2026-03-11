@@ -53,52 +53,11 @@ Fokus ligger på snabb uppdatering och enkel styrning av driftlägen.
 
 Denna integration är designad för att fungera direkt med [Battery Optimizer Light](https://github.com/awestin67/battery-optimizer-light-ha) och ersätter behovet av manuella `rest_command` och `script` i din `configuration.yaml`.
 
-Integrationen exponerar följande:
-*   En switch (`switch.sonnen_manuellt_lage`) för att växla mellan auto- och manuellt läge.
-*   Fyra tjänster som matchar optimerarens kommandon: `auto` (IDLE), `hold` (HOLD), `force_charge` (CHARGE) och `force_discharge` (DISCHARGE).
+### Automatisk Styrning
 
-### Exempelautomation
+Denna integration kan automatiskt lyssna på beslut från `Battery Optimizer Light` och styra ditt batteri, vilket eliminerar behovet av en separat automation.
 
-Här är ett exempel på en automation som använder denna integration för att styra batteriet baserat på optimerarens beslut. Denna automation ersätter helt de gamla skripten.
+1.  Gå till **Inställningar** -> **Enheter & Tjänster** och klicka på **Konfigurera** för `Battery Optimizer Light Sonnen`.
+2.  Kryssa i rutan **Aktivera automatisk styrning**.
 
-```yaml
-alias: 🔋 Battery Optimizer Light - Utför Beslut (Sonnen Integration)
-description: Styr Sonnen-batteriet via integrationens tjänster.
-trigger:
-  - platform: state
-    entity_id: sensor.optimizer_light_action
-  - platform: time_pattern
-    minutes: /5
-condition:
-  - condition: not
-    conditions:
-      - condition: state
-        entity_id: sensor.optimizer_light_action
-        state:
-          - unknown
-          - unavailable
-action:
-  - variables:
-      current_action: "{{ states('sensor.optimizer_light_action') }}"
-      target_power: "{{ (states('sensor.optimizer_light_power') | float(0) * 1000) | int }}"
-  - choose:
-      - conditions: "{{ current_action == 'CHARGE' }}"
-        sequence:
-          - service: battery_optimizer_light_sonnen.force_charge
-            data:
-              power: "{{ target_power }}"
-      - conditions: "{{ current_action == 'DISCHARGE' }}"
-        sequence:
-          - service: battery_optimizer_light_sonnen.force_discharge
-            data:
-              power: "{{ target_power }}"
-      # HOLD: Skickar bara kommando om batteriet rör sig mer än 100W (Snack-filter)
-      - conditions: "{{ current_action == 'HOLD' and states('sensor.sonnen_effekt_totalt') | float(0) | abs > 100 }}"
-        sequence:
-          - service: battery_optimizer_light_sonnen.hold
-      # IDLE: Växla bara till auto om vi är i manuellt läge (switchen är på)
-      - conditions: "{{ current_action == 'IDLE' and is_state('switch.sonnen_manuellt_lage', 'on') }}"
-        sequence:
-          - service: battery_optimizer_light_sonnen.auto
-mode: single
-```
+Integrationen kommer nu att lyssna på `sensor.optimizer_light_action` och agera därefter. Om du föredrar att använda egna automationer kan du lämna rutan urkryssad och använda de inbyggda tjänsterna (`force_charge`, `hold`, etc.) manuellt.
