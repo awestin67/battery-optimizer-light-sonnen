@@ -1,7 +1,7 @@
 {
   "domain": "battery_optimizer_light_sonnen",
   "name": "Sonnen Batteri",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "documentation": "https://github.com/awestin67/battery-optimizer-light-sonnen",
   "requirements": [],
   "dependencies": [],
