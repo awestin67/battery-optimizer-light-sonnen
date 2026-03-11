@@ -1,0 +1,56 @@
+# Battery Optimizer Light
+# Copyright (C) 2026 @awestin67
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+
+"""API-klient för Sonnen Batteri."""
+import logging
+import aiohttp
+from .const import API_STATUS, API_CONFIG
+
+_LOGGER = logging.getLogger(__name__)
+
+class SonnenAPI:
+    """Klass för att kommunicera med Sonnen API V2."""
+
+    def __init__(self, host, port, session: aiohttp.ClientSession):
+        self._host = host
+        self._port = port
+        self._session = session
+        self._base_url = f"http://{host}:{port}"
+
+    async def async_get_status(self):
+        """Hämtar status."""
+        url = f"{self._base_url}{API_STATUS}"
+        try:
+            async with self._session.get(url) as response:
+                response.raise_for_status()
+                return await response.json()
+        except Exception as e:
+            _LOGGER.error("Kunde inte hämta data från Sonnen: %s", e)
+            raise
+
+    async def async_set_operating_mode(self, mode: int):
+        """Sätter driftläge."""
+        url = f"{self._base_url}{API_CONFIG}"
+        payload = {"EM_OperatingMode": str(mode)}
+
+        try:
+            async with self._session.put(url, json=payload) as response:
+                response.raise_for_status()
+                return True
+        except Exception as e:
+            _LOGGER.error("Fel vid ändring av driftläge: %s", e)
+            return False
