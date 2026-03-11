@@ -19,6 +19,7 @@
       "step": {
         "init": {
           "title": "Settings",
+          "description": "Configure connection settings and automatic control behavior.",
           "data": {
             "host": "IP Address",
             "api_token": "API Token",

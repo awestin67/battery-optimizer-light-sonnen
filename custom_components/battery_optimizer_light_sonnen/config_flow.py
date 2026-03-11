@@ -111,16 +111,23 @@ class SonnenOptionsFlowHandler(config_entries.OptionsFlow):
             return self.async_create_entry(title="", data={})
 
         # Hämta nuvarande värden (data + options)
-        current_config = {**self._config_entry.data, **self._config_entry.options}
+        current_data = self._config_entry.data
+        current_options = self._config_entry.options
 
         schema = vol.Schema({
             vol.Required(CONF_HOST): TextSelector(),
             vol.Required(CONF_API_TOKEN): TextSelector(),
-            vol.Optional(CONF_PORT, default=DEFAULT_PORT): int,
+            vol.Optional(CONF_PORT): int,
             vol.Optional(CONF_AUTO_CONTROL): BooleanSelector(),
         })
 
         # Fyll i värden med suggested_values
-        schema = self.add_suggested_values_to_schema(schema, current_config)
+        suggested_values = {
+            CONF_HOST: current_data.get(CONF_HOST),
+            CONF_API_TOKEN: current_data.get(CONF_API_TOKEN),
+            CONF_PORT: current_data.get(CONF_PORT, DEFAULT_PORT),
+            CONF_AUTO_CONTROL: current_options.get(CONF_AUTO_CONTROL, False),
+        }
+        schema = self.add_suggested_values_to_schema(schema, suggested_values)
 
         return self.async_show_form(step_id="init", data_schema=schema)

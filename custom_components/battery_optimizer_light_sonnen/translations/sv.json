@@ -32,10 +32,16 @@
       "step": {
         "init": {
           "title": "Inställningar",
+          "description": "Konfigurera anslutningsinställningar och automatisk styrning.",
           "data": {
+            "host": "IP-adress",
+            "api_token": "API Token",
+            "port": "Port",
             "auto_control": "Aktivera automatisk styrning"
           },
           "data_description": {
+            "host": "Lokal IP-adress till ditt Sonnen-batteri.",
+            "api_token": "Krävs för att styra batteriet.",
             "auto_control": "Om aktiverad lyssnar integrationen automatiskt på 'sensor.optimizer_light_action' från Battery Optimizer Light och styr batteriet därefter (Ladda, Ladda ur, Pausa, Auto). Detta eliminerar behovet av en separat automation."
           }
         }

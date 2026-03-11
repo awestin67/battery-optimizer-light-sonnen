@@ -32,10 +32,16 @@
       "step": {
         "init": {
           "title": "Settings",
+          "description": "Configure connection settings and automatic control behavior.",
           "data": {
+            "host": "IP Address",
+            "api_token": "API Token",
+            "port": "Port",
             "auto_control": "Enable automatic control"
           },
           "data_description": {
+            "host": "Local IP address of your Sonnen battery.",
+            "api_token": "Required to control the battery.",
             "auto_control": "If enabled, the integration automatically listens to 'sensor.optimizer_light_action' from Battery Optimizer Light and controls the battery accordingly (Charge, Discharge, Pause, Auto). This eliminates the need for a separate automation."
           }
         }
