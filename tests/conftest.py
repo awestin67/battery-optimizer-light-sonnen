@@ -17,6 +17,10 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 mock_hass = MagicMock()
 sys.modules["homeassistant"] = mock_hass
 sys.modules["homeassistant.core"] = mock_hass
+
+# Se till att callback bara returnerar funktionen (identity decorator)
+mock_hass.callback = lambda func: func
+
 sys.modules["homeassistant.config_entries"] = mock_hass
 sys.modules["homeassistant.data_entry_flow"] = mock_hass
 sys.modules["homeassistant.helpers"] = mock_hass
@@ -57,6 +61,9 @@ class MockConfigFlow:
 
     def _abort_if_unique_id_configured(self, *args, **kwargs):
         """Mock method for aborting."""
+
+    def async_update_reload_and_abort(self, *args, **kwargs):
+        """Mock method for update reload and abort."""
 mock_hass.ConfigFlow = MockConfigFlow
 
 class MockOptionsFlow:

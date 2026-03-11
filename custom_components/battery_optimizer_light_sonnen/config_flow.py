@@ -76,30 +76,6 @@ class SonnenConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             },
         )
 
-class SonnenOptionsFlowHandler(config_entries.OptionsFlow):
-    """Handle an options flow for Sonnen."""
-
-    def __init__(self, config_entry: config_entries.ConfigEntry):
-        """Initialize options flow."""
-        self.config_entry = config_entry
-
-    async def async_step_init(self, user_input=None):
-        """Manage the options."""
-        if user_input is not None:
-            return self.async_create_entry(title="", data=user_input)
-
-        return self.async_show_form(
-            step_id="init",
-            data_schema=vol.Schema(
-                {
-                    vol.Optional(
-                        CONF_AUTO_CONTROL,
-                        default=self.config_entry.options.get(CONF_AUTO_CONTROL, False),
-                    ): bool,
-                }
-            ),
-        )
-
     async def async_step_reconfigure(self, user_input=None):
         """Hantera omkonfigurering."""
         errors = {}
@@ -120,11 +96,17 @@ class SonnenOptionsFlowHandler(config_entries.OptionsFlow):
                 _LOGGER.warning("Kunde inte ansluta till Sonnen-batteriet vid %s", user_input[CONF_HOST])
                 errors["base"] = "cannot_connect"
             else:
-                return self.async_update_reload_and_abort(entry, data=user_input)
+                # Skapa en ny data-struktur som rensar bort gamla/okända nycklar
+                new_data = {
+                    CONF_HOST: user_input[CONF_HOST],
+                    CONF_PORT: user_input[CONF_PORT],
+                    CONF_API_TOKEN: user_input[CONF_API_TOKEN],
+                }
+                return self.async_update_reload_and_abort(entry, data=new_data)
 
         data_schema = vol.Schema({
-            vol.Required(CONF_HOST, default=entry.data[CONF_HOST]): str,
-            vol.Required(CONF_API_TOKEN, default=entry.data[CONF_API_TOKEN]): str,
+            vol.Required(CONF_HOST, default=entry.data.get(CONF_HOST)): str,
+            vol.Required(CONF_API_TOKEN, default=entry.data.get(CONF_API_TOKEN)): str,
             vol.Optional(CONF_PORT, default=entry.data.get(CONF_PORT, DEFAULT_PORT)): int,
         })
 
@@ -135,4 +117,28 @@ class SonnenOptionsFlowHandler(config_entries.OptionsFlow):
             description_placeholders={
                 "api_token_url": "https://community.home-assistant.io/t/sonnen-battery-and-home-assistant/16124/165"
             },
+        )
+
+class SonnenOptionsFlowHandler(config_entries.OptionsFlow):
+    """Handle an options flow for Sonnen."""
+
+    def __init__(self, config_entry):
+        """Initialize options flow."""
+        self._config_entry = config_entry
+
+    async def async_step_init(self, user_input=None):
+        """Manage the options."""
+        if user_input is not None:
+            return self.async_create_entry(title="", data=user_input)
+
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema(
+                {
+                    vol.Optional(
+                        CONF_AUTO_CONTROL,
+                        default=self._config_entry.options.get(CONF_AUTO_CONTROL, False),
+                    ): bool,
+                }
+            ),
         )
