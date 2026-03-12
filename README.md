@@ -18,6 +18,7 @@ Fokus ligger på snabb uppdatering och enkel styrning av driftlägen.
     *   🏠 **Husförbrukning (W)** - Husets totala förbrukning.
     *   📉 **Virtual Load (W)** - Beräknad nettolast (Konsumtion - Produktion).
     *   ℹ️ **System Status** - Diagnostik (t.ex. OnGrid, OffGrid).
+    *   📡 **Anslutningsstatus** - Visar om integrationen har kontakt med batteriet (Connectivity).
 *   **Styrning:**
     *   🔘 **Driftläge (Switch)** - Växla mellan `Self Consumption` (Automatiskt läge) och `Manual Mode`.
     *   🛠 **Tjänster** - `force_charge`, `force_discharge`, `hold` och `auto` för avancerad styrning.

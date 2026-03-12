@@ -32,6 +32,7 @@ sys.modules["homeassistant.helpers.selector"] = mock_hass
 sys.modules["homeassistant.components"] = mock_hass
 sys.modules["homeassistant.components.sensor"] = mock_hass
 sys.modules["homeassistant.components.switch"] = mock_hass
+sys.modules["homeassistant.components.binary_sensor"] = mock_hass
 sys.modules["homeassistant.const"] = mock_hass
 sys.modules["homeassistant.util"] = mock_hass
 sys.modules["homeassistant.exceptions"] = mock_hass
@@ -159,6 +160,14 @@ mock_hass.SensorEntity = SensorEntity
 class SwitchEntity:
     pass
 mock_hass.SwitchEntity = SwitchEntity
+
+class BinarySensorEntity(MockEntity):
+    pass
+mock_hass.BinarySensorEntity = BinarySensorEntity
+
+class BinarySensorDeviceClass:
+    CONNECTIVITY = "connectivity"
+mock_hass.BinarySensorDeviceClass = BinarySensorDeviceClass
 
 @pytest.fixture(autouse=True)
 def auto_enable_custom_integrations():

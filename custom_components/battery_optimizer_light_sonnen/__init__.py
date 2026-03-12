@@ -34,7 +34,7 @@ from .const import CONF_HOST, CONF_PORT, CONF_API_TOKEN, DOMAIN, CONF_AUTO_CONTR
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS = ["sensor", "switch"]
+PLATFORMS = ["sensor", "switch", "binary_sensor"]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
