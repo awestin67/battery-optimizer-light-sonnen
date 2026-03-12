@@ -143,6 +143,60 @@ def run_lint():
         print("\n❌ Linting misslyckades! Åtgärda felen innan release.")
         sys.exit(1)
 
+def check_license_headers():
+    """Kontrollerar att alla python-filer har rätt licens-header."""
+    print("\n--- 📄 KONTROLLERAR LICENS-HEADERS ---")
+
+    short_header = "Copyright (C) 2026 @awestin67"
+    # Del av den långa GPL-texten för verifiering
+    long_header_part = "This program is free software: you can redistribute it"
+
+    missing_short = []
+    missing_long = []
+
+    for root, dirs, files in os.walk(BASE_DIR):
+        # Ignorera mappar
+        dirs[:] = [d for d in dirs if d not in [".venv", "__pycache__", ".git", ".pytest_cache"]]
+
+        for file in files:
+            if file.endswith(".py"):
+                file_path = os.path.join(root, file)
+                rel_path = os.path.relpath(file_path, BASE_DIR)
+                try:
+                    with open(file_path, "r", encoding="utf-8") as f:
+                        content = f.read()
+
+                        # 1. Alla filer ska ha Copyright-raden
+                        if short_header not in content:
+                            missing_short.append(rel_path)
+                            continue
+
+                        # 2. Filer under custom_components ska ha lång header
+                        if "custom_components" in rel_path:
+                            if long_header_part not in content:
+                                missing_long.append(rel_path)
+
+                except Exception as e:
+                    print(f"⚠️  Kunde inte läsa {file_path}: {e}")
+
+    failed = False
+    if missing_short:
+        print("❌ Följande filer saknar Copyright-header:")
+        for f in missing_short:
+            print(f"   - {f}")
+        failed = True
+
+    if missing_long:
+        print("❌ Följande filer under custom_components saknar fullständig GPL-licenstext:")
+        for f in missing_long:
+            print(f"   - {f}")
+        failed = True
+
+    if failed:
+        sys.exit(1)
+
+    print("✅ Alla Python-filer har korrekt licens-header.")
+
 def check_images():
     """Kollar att bilder finns för HA UI och skapar icon.png om den saknas."""
     print("\n--- 🖼️  KOLLAR BILDER ---")
@@ -283,6 +337,7 @@ def main():
     check_branch()
     run_tests()
     run_lint()
+    check_license_headers()
     check_images()
     check_for_updates()
 
