@@ -45,11 +45,21 @@ class SonnenConnectivitySensor(CoordinatorEntity, BinarySensorEntity):
         """Initiera sensorn."""
         super().__init__(coordinator)
         self._entry = entry
-        self._attr_unique_id = f"{entry.entry_id}_connectivity"
-        # Kopplar mot översättningen i sv.json under "entity" -> "binary_sensor" -> "connectivity"
-        self._attr_translation_key = "connectivity"
+        self._attr_unique_id = f"{entry.entry_id}_api_status"
+        # Kopplar mot översättningen i sv.json under "entity" -> "binary_sensor" -> "api_status"
+        self._attr_translation_key = "api_status"
+        self._attr_device_info = {
+            "identifiers": {(DOMAIN, entry.entry_id)},
+            "name": "Battery Optimizer Light Sonnen",
+            "manufacturer": "Sonnen",
+        }
 
     @property
     def is_on(self):
         """Returnera True om coordinatorn lyckades med senaste uppdateringen."""
         return self.coordinator.last_update_success
+
+    @property
+    def available(self) -> bool:
+        """Sensorn är alltid tillgänglig för att kunna rapportera 'Frånkopplad'."""
+        return True

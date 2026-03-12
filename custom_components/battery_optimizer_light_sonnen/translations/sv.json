@@ -40,5 +40,12 @@
         }
       }
     }
+  },
+  "entity": {
+    "binary_sensor": {
+      "api_status": {
+        "name": "Sonnen API-anslutning"
+      }
+    }
   }
 }

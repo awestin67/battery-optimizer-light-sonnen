@@ -11,7 +11,7 @@
         },
         "data_description": {
           "host": "Local IP address of your Sonnen battery. Usually found in your router or via the Sonnen app.",
-          "api_token": "Required to control the battery. Log in to your battery (http://[IP-ADDRESS]/dash/login) as 'user', select 'Software integration' and enable 'JSON API' (both Read and Write). Copy your Auth-Token from there. See also [this guide]({api_token_url})."
+          "api_token": "Required to control the battery. Log in to your battery's web interface (via its IP address) as 'user', select 'Software integration' and enable 'JSON API' (both Read and Write). Copy your Auth-Token from there. See also [this guide]({api_token_url})."
         }
       }
     },
@@ -38,6 +38,13 @@
           "api_token": "Required to control the battery.",
           "auto_control": "If enabled, the integration automatically listens to 'sensor.optimizer_light_action' from Battery Optimizer Light and controls the battery accordingly (Charge, Discharge, Pause, Auto). This eliminates the need for a separate automation."
         }
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "api_status": {
+        "name": "Sonnen API Connection"
       }
     }
   }

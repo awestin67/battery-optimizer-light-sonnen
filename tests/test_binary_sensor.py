@@ -23,7 +23,7 @@ def test_connectivity_sensor_connected():
     assert sensor.is_on is True
     # Tack vare uppdateringen i conftest.py jämför vi nu strängen "connectivity"
     assert sensor.device_class == BinarySensorDeviceClass.CONNECTIVITY
-    assert sensor.unique_id == "test_entry_connectivity"
+    assert sensor.unique_id == "test_entry_api_status"
     assert sensor.entity_category == EntityCategory.DIAGNOSTIC
 
 def test_connectivity_sensor_disconnected():
