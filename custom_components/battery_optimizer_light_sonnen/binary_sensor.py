@@ -37,7 +37,6 @@ async def async_setup_entry(hass, entry, async_add_entities):
 class SonnenConnectivitySensor(CoordinatorEntity, BinarySensorEntity):
     """Sensor som visar om vi har kontakt med batteriet."""
 
-    _attr_has_entity_name = True
     _attr_device_class = BinarySensorDeviceClass.CONNECTIVITY
     _attr_entity_category = EntityCategory.DIAGNOSTIC
 
@@ -45,9 +44,8 @@ class SonnenConnectivitySensor(CoordinatorEntity, BinarySensorEntity):
         """Initiera sensorn."""
         super().__init__(coordinator)
         self._entry = entry
-        self._attr_unique_id = f"{entry.entry_id}_api_status"
-        # Kopplar mot översättningen i sv.json under "entity" -> "binary_sensor" -> "api_status"
-        self._attr_translation_key = "api_status"
+        self._attr_name = "Sonnen API Anslutning"
+        self._attr_unique_id = "sonnen_api_anslutning"
         self._attr_device_info = {
             "identifiers": {(DOMAIN, entry.entry_id)},
             "name": "Battery Optimizer Light Sonnen",

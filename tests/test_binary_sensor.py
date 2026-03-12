@@ -21,9 +21,10 @@ def test_connectivity_sensor_connected():
 
     # 3. Verifiera egenskaper
     assert sensor.is_on is True
+    assert sensor.name == "Sonnen API Anslutning"
     # Tack vare uppdateringen i conftest.py jämför vi nu strängen "connectivity"
     assert sensor.device_class == BinarySensorDeviceClass.CONNECTIVITY
-    assert sensor.unique_id == "test_entry_api_status"
+    assert sensor.unique_id == "sonnen_api_anslutning"
     assert sensor.entity_category == EntityCategory.DIAGNOSTIC
 
 def test_connectivity_sensor_disconnected():
