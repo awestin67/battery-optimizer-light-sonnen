@@ -462,7 +462,7 @@ def generate_ai_releasenotes(commits: str, api_key: str | None) -> str | None:
 
     print("\n🤖 Ber Gemini AI att summera release notes...", end="", flush=True)
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={api_key}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
     headers = {"Content-Type": "application/json"}
 
     prompt = f"""
