@@ -453,6 +453,60 @@ def check_github_metadata(repo_slug: str | None, token: str | None) -> None:
     except Exception as e:
         print(f"⚠️  Fel vid metadatakontroll: {e}")
 
+def generate_ai_releasenotes(commits: str, api_key: str | None) -> str | None:
+    """Generates release notes from commits using Gemini AI."""
+    if not api_key:
+        return None
+    if not commits.strip():
+        return ""
+
+    print("\n🤖 Ber Gemini AI att summera release notes...", end="", flush=True)
+
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={api_key}"
+    headers = {"Content-Type": "application/json"}
+
+    prompt = f"""
+Baserat på följande commit-historik, skapa en snygg och koncis release note på svenska.
+Använd markdown och gruppera ändringarna under passande rubriker som:
+- 🚀 Features
+- 🐛 Fixes
+- 🔧 Refactoring
+- 📄 Documentation
+- ⚙️ Chore / Maintenance
+
+Ignorera commits som "Release X.X.X".
+Svara endast med den färdiga markdown-texten, utan någon inledande eller avslutande text.
+
+Commits:
+---
+{commits}
+---
+"""
+
+    payload = {
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {
+            "temperature": 0.5,
+            "topK": 1,
+            "topP": 1,
+            "maxOutputTokens": 2048,
+        },
+    }
+
+    try:
+        response = requests.post(url, headers=headers, json=payload, timeout=30)
+        if response.status_code != 200:
+            print(f" ❌ Fel från Gemini API ({response.status_code}): {response.text}")
+            return None
+
+        data = response.json()
+        ai_notes = data['candidates'][0]['content']['parts'][0]['text']
+        print(" ✅ AI-förslag skapat!")
+        return ai_notes.strip()
+    except (requests.exceptions.RequestException, KeyError, IndexError, Exception) as e:
+        print(f" ❌ Ett fel uppstod vid AI-generering: {e}")
+        return None
+
 def create_github_release(version: str, repo_slug: str | None = None) -> None:
     print("\n--- 🚀 SKAPA GITHUB RELEASE ---")
 
@@ -462,6 +516,7 @@ def create_github_release(version: str, repo_slug: str | None = None) -> None:
         repo_part = get_github_repo_slug()
 
     token = os.getenv("GITHUB_TOKEN")
+    gemini_api_key = os.getenv("GEMINI_API_KEY")
     if not token:
         print("\n⚠️  Ingen GITHUB_TOKEN hittad.")
         print("   (GitHub kräver token för att skapa releaser via API, även för publika repon)")
@@ -480,27 +535,46 @@ def create_github_release(version: str, repo_slug: str | None = None) -> None:
         return
 
     # Försök hämta commits sedan förra taggen
-    suggested_notes = ""
+    raw_commits = ""
     try:
         tags_out = run_command(["git", "tag", "--sort=-creatordate"], capture_output=True, exit_on_error=False)
         tags = tags_out.splitlines()
 
         if len(tags) >= 2:
             prev_tag = tags[1]
-            commits = run_command(
-                ["git", "log", f"{prev_tag}..HEAD", "--pretty=format:- %s"],
+            print(f"Hämtar commits sedan tagg '{prev_tag}'...")
+            raw_commits = run_command(
+                ["git", "log", f"{prev_tag}..HEAD", "--pretty=format:%s"],
                 capture_output=True,
                 exit_on_error=False,
             )
-
-            # Filtrera bort release-commiten
-            lines = [line for line in commits.splitlines() if f"Release {version}" not in line]
-            suggested_notes = "\n".join(lines)
+        else:
+            print("⚠️ Ingen tidigare tagg hittad. Hämtar de 20 senaste commitarna...")
+            raw_commits = run_command(
+                ["git", "log", "-n", "20", "--pretty=format:%s"],
+                capture_output=True,
+                exit_on_error=False,
+            )
     except Exception:
         pass
 
+    # Filtrera bort release-commiten
+    if raw_commits:
+        lines = [line for line in raw_commits.splitlines() if f"Release {version}" not in line]
+        raw_commits = "\n".join(lines)
+
+    # Försök generera AI-notes, annars använd råa commits
+    suggested_notes = generate_ai_releasenotes(raw_commits, gemini_api_key)
+    if suggested_notes is None:  # AI misslyckades eller ingen nyckel
+        if gemini_api_key:
+            print(" (AI-generering misslyckades, återgår till enkel lista)")
+        else:
+            print(" (Tips: Lägg till GEMINI_API_KEY i .env för AI-genererade notes)")
+        # Återgå till enkel lista
+        suggested_notes = "\n".join([f"- {line}" for line in raw_commits.splitlines() if line])
+
     if suggested_notes:
-        print("\n📝 Föreslagna release notes (baserat på commits):")
+        print("\n📝 Föreslagna release notes:")
         print("-" * 40)
         print(suggested_notes)
         print("-" * 40)
