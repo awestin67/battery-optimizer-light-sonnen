@@ -22,7 +22,7 @@ from collections import OrderedDict
 from pathlib import Path
 import os
 
-def get_project_python():
+def get_project_python() -> Path:
     """Tries to find the python executable in the local .venv"""
     project_root = Path(__file__).resolve().parent
     venv_path_win = project_root / ".venv" / "Scripts" / "python.exe"
@@ -41,6 +41,12 @@ def get_project_python():
     sys.exit(1) # Avbryter skriptet direkt med en felkod
 
 python_exe = get_project_python()
+
+# Förhindra att skriptet körs utanför den lokala virtuella miljön
+if os.path.normcase(os.path.abspath(sys.executable)) != os.path.normcase(os.path.abspath(python_exe)):
+    print("❌ Varning: Skriptet verkar köras utanför den virtuella miljön!")
+    print(f"👉 Vänligen aktivera din .venv och kör skriptet igen (t.ex: '{python_exe} release.py')")
+    sys.exit(1)
 
 try:
     import requests
@@ -65,16 +71,34 @@ except ImportError:
 BASE_DIR = Path(__file__).resolve().parent
 MANIFEST_PATH = BASE_DIR / "custom_components" / "battery_optimizer_light_sonnen" / "manifest.json"
 
-def run_command(command):
+IGNORED_LICENSE_CHECK_DIRS = {
+    ".venv", "venv", "env", "__pycache__", ".git", ".pytest_cache",
+    "requests", "Lib", "site-packages", "build", "dist"
+}
+
+def run_command(
+    command: list[str],
+    capture_output: bool = False,
+    cwd: Path | str | None = None,
+    exit_on_error: bool = True,
+) -> str:
     """Hjälpfunktion för att köra terminalkommandon"""
     try:
-        subprocess.run(command, check=True, shell=False)
-    except subprocess.CalledProcessError:
-        cmd_str = ' '.join(command) if isinstance(command, list) else command
-        print(f"❌ Fel vid kommando: {cmd_str}")
-        sys.exit(1)
+        result = subprocess.run(
+            command, check=True, shell=False,
+            capture_output=capture_output, text=True if capture_output else False, cwd=cwd
+        )
+        return result.stdout.strip() if capture_output else ""
+    except subprocess.CalledProcessError as e:
+        if exit_on_error:
+            cmd_str = ' '.join(command)
+            print(f"❌ Fel vid kommando: {cmd_str}")
+            if capture_output and e.stderr:
+                print(f"Felmeddelande:\n{e.stderr.strip()}")
+            sys.exit(1)
+        raise e
 
-def get_current_version(file_path):
+def get_current_version(file_path: Path) -> str:
     try:
         with open(file_path, "r", encoding="utf-8") as f: # Path-objekt fungerar här
             data = json.load(f)
@@ -87,7 +111,7 @@ def get_current_version(file_path):
         print(f"❌ Filen {file_path} innehåller ogiltig JSON.")
         sys.exit(1)
 
-def bump_version(version, part):
+def bump_version(version: str, part: str) -> str:
     major, minor, patch = map(int, version.split('.'))
     if part == "major":
         major += 1
@@ -100,7 +124,7 @@ def bump_version(version, part):
         patch += 1
     return f"{major}.{minor}.{patch}"
 
-def update_manifest(file_path, new_version):
+def update_manifest(file_path: Path, new_version: str) -> None:
     with open(file_path, "r", encoding="utf-8") as f: # Path-objekt fungerar här
         data = json.load(f)
 
@@ -109,16 +133,17 @@ def update_manifest(file_path, new_version):
     with open(file_path, "w", encoding="utf-8") as f: # Path-objekt fungerar här
         json.dump(data, f, indent=2, ensure_ascii=False)
 
-def check_for_updates():
+def check_for_updates() -> None:
     print("\n--- 🔍 KOLLAR EFTER UPPDATERINGAR (SSH) ---")
     try:
         print("Hämtar status från GitHub...")
-        run_command(["git", "fetch", "origin"])
+        run_command(["git", "fetch", "origin"], exit_on_error=False)
 
-        incoming = subprocess.check_output(
+        incoming = run_command(
             ["git", "log", "HEAD..origin/HEAD", "--oneline"],
-            shell=False
-        ).decode().strip()
+            capture_output=True,
+            exit_on_error=False,
+        )
 
         if incoming:
             print("\n❌ STOPP! GitHub har ändringar som du saknar:")
@@ -130,13 +155,10 @@ def check_for_updates():
     except subprocess.CalledProcessError:
         print("⚠️  Kunde inte nå GitHub. Fortsätter ändå...")
 
-def check_branch():
+def check_branch() -> None:
     """Varnar om man inte står på main-branchen"""
     try:
-        branch = subprocess.check_output(
-            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
-            shell=False
-        ).decode().strip()
+        branch = run_command(["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, exit_on_error=False)
         if branch != "main":
             print(f"⚠️  Du står på branch '{branch}'. Rekommenderat är 'main'.")
             confirm = input("Vill du fortsätta ändå? (j/n): ")
@@ -145,7 +167,7 @@ def check_branch():
     except subprocess.CalledProcessError:
         pass
 
-def run_tests():
+def run_tests() -> None:
     print("\n--- 🧪 KÖR TESTER ---")
     try:
         test_dir = BASE_DIR / "tests"
@@ -163,7 +185,7 @@ def run_tests():
         print("\n❌ Testerna misslyckades! Åtgärda felen innan release.")
         sys.exit(1)
 
-def run_lint():
+def run_lint() -> None:
     print("\n--- 🧹 KÖR LINT (Ruff) ---")
     try:
         # Kör ruff i BASE_DIR
@@ -175,7 +197,7 @@ def run_lint():
         print("\n❌ Linting misslyckades! Åtgärda felen innan release.")
         sys.exit(1)
 
-def check_license_headers():
+def check_license_headers() -> None:
     """Kontrollerar att alla python-filer har rätt licens-header."""
     print("\n--- 📄 KONTROLLERAR LICENS-HEADERS ---")
 
@@ -188,11 +210,7 @@ def check_license_headers():
 
     for root_str, dirs, files in os.walk(BASE_DIR):
         # Ignorera mappar
-        ignored = [
-            ".venv", "venv", "env", "__pycache__", ".git", ".pytest_cache",
-            "requests", "Lib", "site-packages", "build", "dist"
-        ]
-        dirs[:] = [d for d in dirs if d not in ignored]
+        dirs[:] = [d for d in dirs if d not in IGNORED_LICENSE_CHECK_DIRS]
 
         for file in files:
             if file.endswith(".py"):
@@ -233,7 +251,7 @@ def check_license_headers():
 
     print("✅ Alla Python-filer har korrekt licens-header.")
 
-def sort_manifest_keys(file_path):
+def sort_manifest_keys(file_path: Path) -> None:
     """Sorterar nycklar i manifest.json enligt Hassfest-krav: domain, name, sedan alfabetiskt."""
     print(f"\n--- 🔧 FIXAR SORTERING I {Path(file_path).name} ---")
     try:
@@ -263,7 +281,7 @@ def sort_manifest_keys(file_path):
     except Exception as e:
         print(f"⚠️  Kunde inte sortera manifest: {e}")
 
-def run_hassfest_local():
+def run_hassfest_local() -> None:
     """Försöker köra hassfest via Docker om det finns tillgängligt."""
     print("\n--- 🏠 KÖR HASSFEST (Docker) ---")
 
@@ -299,7 +317,7 @@ def run_hassfest_local():
         if input("   Vill du fortsätta ändå? (j/n): ").lower() != 'j':
             sys.exit(1)
 
-def run_hacs_validation_local():
+def run_hacs_validation_local() -> None:
     """Validerar specifika HACS-krav lokalt (filer och manifest-data)."""
     print("\n--- 📦 HACS VALIDERING (Lokal) ---")
 
@@ -336,7 +354,7 @@ def run_hacs_validation_local():
     except Exception as e:
         print(f"⚠️  Kunde inte läsa manifest för HACS-koll: {e}")
 
-def check_images():
+def check_images() -> None:
     """Kollar att bilder finns för HA UI och skapar icon.png om den saknas."""
     print("\n--- 🖼️  KOLLAR BILDER ---")
     comp_dir = BASE_DIR / "custom_components" / "battery_optimizer_light_sonnen"
@@ -353,12 +371,14 @@ def check_images():
     else:
         print("⚠️  Ingen logo.png hittades. Integrationen kommer sakna bilder i HA.")
 
-def get_github_repo_slug():
+def get_github_repo_slug() -> str | None:
     """Hämtar 'user/repo' från git config."""
     try:
-        remote_url = subprocess.check_output(
-            ["git", "config", "--get", "remote.origin.url"], shell=False
-        ).decode().strip()
+        remote_url = run_command(
+            ["git", "config", "--get", "remote.origin.url"],
+            capture_output=True,
+            exit_on_error=False,
+        )
         if "github.com" in remote_url:
             slug = remote_url.split("github.com")[-1].replace(":", "/").lstrip("/")
             if slug.endswith(".git"):
@@ -368,7 +388,7 @@ def get_github_repo_slug():
         pass
     return None
 
-def check_github_metadata(repo_slug, token):
+def check_github_metadata(repo_slug: str | None, token: str | None) -> None:
     """Kontrollerar och uppdaterar GitHub-metadata (Beskrivning & Ämnen)."""
     if not repo_slug:
         return
@@ -433,7 +453,7 @@ def check_github_metadata(repo_slug, token):
     except Exception as e:
         print(f"⚠️  Fel vid metadatakontroll: {e}")
 
-def create_github_release(version, repo_slug=None):
+def create_github_release(version: str, repo_slug: str | None = None) -> None:
     print("\n--- 🚀 SKAPA GITHUB RELEASE ---")
 
     # Hitta repo-namn från git config
@@ -462,17 +482,16 @@ def create_github_release(version, repo_slug=None):
     # Försök hämta commits sedan förra taggen
     suggested_notes = ""
     try:
-        tags = subprocess.check_output(
-            ["git", "tag", "--sort=-creatordate"],
-            stderr=subprocess.DEVNULL
-        ).decode().strip().splitlines()
+        tags_out = run_command(["git", "tag", "--sort=-creatordate"], capture_output=True, exit_on_error=False)
+        tags = tags_out.splitlines()
 
         if len(tags) >= 2:
             prev_tag = tags[1]
-            commits = subprocess.check_output(
+            commits = run_command(
                 ["git", "log", f"{prev_tag}..HEAD", "--pretty=format:- %s"],
-                stderr=subprocess.DEVNULL
-            ).decode().strip()
+                capture_output=True,
+                exit_on_error=False,
+            )
 
             # Filtrera bort release-commiten
             lines = [line for line in commits.splitlines() if f"Release {version}" not in line]
@@ -541,7 +560,7 @@ def create_github_release(version, repo_slug=None):
     except Exception as e:
         print(f"❌ Fel vid API-anrop: {e}")
 
-def main():
+def main() -> None:
     # 1. Säkerhetskollar
     check_branch()
     repo_slug = get_github_repo_slug()
