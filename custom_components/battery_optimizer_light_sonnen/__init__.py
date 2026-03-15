@@ -136,6 +136,9 @@ async def async_setup_auto_control(hass: HomeAssistant, entry: ConfigEntry):
     if entry.options.get(CONF_AUTO_CONTROL, True):
         _LOGGER.info("Automatic control from sensor.optimizer_light_action is enabled.")
 
+        if hass.states.get("sensor.optimizer_light_action") is None:
+            _LOGGER.warning("sensor.optimizer_light_action not found. Waiting for it to become available.")
+
         async def handle_optimizer_action_change(event: Event):
             """Handle state changes for sensor.optimizer_light_action."""
             new_state = event.data.get("new_state")
